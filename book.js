@@ -1,53 +1,51 @@
-// on click function 
-const getBook = () => {
-    const inputField = document.getElementById('input-value')
-    const inputText = inputField.value
+// Hendel Search Button,
 
-
-    // clearing input value after search 
-    inputField.value = '';
-
-    // taking the api 
-    const url = (`https://openlibrary.org/search.json?q=${inputText}`)
+search = () => {
+    const inputData = document.querySelector('#input');
+    const inputValue = inputData.value;
+    inputData.value = '';
+    const url = `https://openlibrary.org/search.json?q=${inputValue}`;
     fetch(url)
-        .then(res => res.json())
-        .then(data => displayBooks(data.docs))
-
-}
-
-
-// declaring function for display books 
-const displayBooks = books => {
-    const divSection = document.getElementById('div-section')
-
-    // clearing all items 
-    divSection.innerHTML = '';
-
-    // if items not available 
-    if (books.length === 0)
-        alert("No Books Found in our STORE, Please Check spelling or Search another Book.")
-
-    // using for each loop
-    books.forEach(book => {
-        const newDiv = document.createElement('div')
-
-        // adding New Div contents 
-
-        newDiv.innerHTML = `
-        <div class="col">
-            <div class="card h-100">
-                <img src="https://covers.openlibrary.org/b/id/ ${book.cover_i}-M.jpg" class="card-img-top width-50" alt="...">
-                <div class="card-body">
-                    <h3 class="card-title"> ${book.title} </h3>
-                    <p class="card-text"> Author's Name : ${book.author_name} </p>
-                    <p class=" Publisher card-text"> Book Publisher's Name : ${book.publisher} </p>
-                    <p class="card-text"> First publishing year : ${book.first_publish_year} </p>
-                    
-                </div>
-            </div>
-        </div>
-                            `
-        divSection.appendChild(newDiv);
-    });
-
-}
+      .then(res => res.json())
+      .then(data => display(data))
+  }
+  // Display function call --
+  const display = (data) => {
+    const mainDivRef = document.querySelector('#mainDiv');
+    mainDivRef.textContent = '';
+    if (data.numFound == 0) {
+      const getResult = document.querySelector('#result');
+      getResult.innerHTML = `<h3 class="text-danger">No Data Found</h3>`;
+    } else {
+      const rootData = data.docs;
+      const dataSlice = rootData.slice(1, 22);
+      dataSlice.forEach((items) => {
+  
+        const mainDiv = document.querySelector('#mainDiv');
+        const mkDiv = document.createElement('div');
+        const addClass = mkDiv.classList.add(`col-md-4`);
+        const imgSrc = `src="../img/AMIT.png"`;
+        const serverImg = `src="https://covers.openlibrary.org/b/id/${items.cover_i}-M.jpg"`
+  
+        mkDiv.innerHTML = `    
+         <div class="card my-3">
+             <img class="card-img-top img-fluid" ${items.cover_i===undefined?imgSrc:serverImg}>
+             <div class="card-body">
+               <h5 class="card-title text-primary">Book Name : ${items.title}</h5>
+            <p class="card-title">Author Name : <span class="text-primary"> ${items.author_name===undefined?"It's undefined": items.author_name[0]} </span></p>
+            <p class=" Publisher card-text"> Book Publisher's Name :<span class="text-primary"> ${items.publisher} </span></p>
+               <p class="card-title">First Publish Year :<span class="text-primary"> ${items.publish_year===undefined?" It's undefined":items.publish_year[0]}</span></p>
+               
+             </div>
+           </div>
+         `;
+        
+        mainDiv.appendChild(mkDiv);
+  
+        // Get total result ----
+  
+        getResult = document.querySelector('#result');
+        getResult.innerHTML = `<h3 class="text-success">Search Result : 20 of ${data.numFound}</h3>`;
+      })
+    }
+  }
